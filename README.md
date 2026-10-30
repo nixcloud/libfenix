@@ -16,6 +16,9 @@ are fenix's, restricted to two pinned versions.
 There are no channels (stable, beta, nightly) and no dated toolchains: a toolchain needs a cargo (libnix) release of
 its version. Other versions, dates or channels fail with an error naming the supported ones.
 
+![a phoenix looking at a rustacean](./libfenix.png)
+
+
 ## Usage
 
 As a flake:
