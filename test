@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+for bin in result*/bin/*; do
+    echo "$bin"
+    case "$(basename "$(basename "$bin")")" in
+        cargo)
+            # cargo (libnix) of the toolchain's rustc version
+            "$bin" --version | grep -q "+libnix"
+            version=$("$bin" --version | cut -d' ' -f2)
+            "$(dirname "$bin")/rustc" -V | grep -q "^rustc $version ";;
+        cargo-miri)
+            "$bin" miri -h > /dev/null;;
+        miri)
+            "$bin" --help --sysroot /dev/null > /dev/null;;
+        rls)
+            ;;
+        rust-demangler)
+            ;;
+        rust-gdb)
+            ;;
+        rust-lldb)
+            ;;
+        *)
+            "$bin" --help > /dev/null
+    esac
+done
