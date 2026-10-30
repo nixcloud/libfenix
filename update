@@ -29,3 +29,13 @@ for version in "${!manifest_sha256[@]}"; do
       pkg = builtins.removeAttrs pkgs (builtins.filter (c: pkgs.${c}.target == { }) (builtins.attrNames pkgs));
     }' | jq --indent 0 . > "data/$version.json"
 done
+
+# The cargo (libnix) release assets (lib/releases.nix): built from source here, their hashes pinned in releases.nix.
+# Upload each to its nixcloud/cargo release as printed.
+for line in rust-1_87 rust-1_99; do
+  asset=$(nix build --no-link --print-out-paths ".#$line.cargo.asset")
+  tag=$(nix eval --raw ".#$line.libnixRelease")
+  sha256=$(nix hash file --type sha256 --base32 "$asset")
+  sed -i "/tag = \"$tag\";/{n;s|assetSha256 = .*;|assetSha256 = \"$sha256\";|}" lib/releases.nix
+  echo "$asset: upload to https://github.com/nixcloud/cargo/releases/tag/${tag/+/%2B} as cargo-$tag-x86_64-unknown-linux-gnu.tar.xz" >&2
+done

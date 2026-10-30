@@ -66,8 +66,9 @@ let
       inherit manifest;
     };
 
-  # a supported version for `target`: cargo (libnix) of that version, built with the dist toolchain of the build
-  # platform (it runs there). Other targets only provide what cross compiling needs from them (rust-std)
+  # a supported version for `target`: the prebuilt cargo (libnix) of that version for the build platform (it runs
+  # there; `cargo.fromSource` builds it with the dist toolchain). Other targets only provide what cross compiling needs
+  # from them (rust-std)
   toolchainFor = target: version:
     let
       suffix = "-${version}";
@@ -77,7 +78,7 @@ let
     in
     fromManifest' target suffix manifest (if target == v then cargo else null) // {
       inherit version;
-      libnixRelease = cargo.libnixRelease;
+      libnixRelease = cargo.passthru.libnixRelease;
     };
 
   toolchains = lib.listToAttrs (map (version: nameValuePair (attrName version) (toolchainFor v version)) versions);
