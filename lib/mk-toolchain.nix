@@ -1,4 +1,4 @@
-{ callPackage, fetchurl, lib, stdenv, zlib, curl, makeBinaryWrapper }:
+{ callPackage, fetchurl, lib, path, stdenv, zlib, curl, makeBinaryWrapper }:
 
 suffix:
 { date, components, cargo ? null }:
@@ -20,6 +20,14 @@ let
       version = source.version or source.date or date;
       src = fetchurl { inherit (source) url sha256; };
       passthru = source.passthru or { };
+
+      # the @...@ of the ld-wrapper.sh the bundled ld.lld goes through (see below), as nix's bintools wrapper sets them
+      env = optionalAttrs (component == "rustc" && stdenv.hostPlatform.isLinux) {
+        inherit (stdenv.cc.bintools) expandResponseParams shell suffixSalt wrapperName coreutils_bin rm mktemp;
+        hardening_unsupported_flags = "";
+        darwinMinVersion = "";
+        fallback_sdk = "";
+      };
 
       nativeBuildInputs = optionals (component == "rustfmt-preview" && stdenv.hostPlatform.isDarwin) [
         makeBinaryWrapper
@@ -89,6 +97,37 @@ let
                   mkdir -p "$dir/lib"
                   ln -s $out/lib/libLLVM.dylib "$dir/lib/libLLVM.dylib"
                 fi
+              done
+            fi
+          ''}
+          ${optionalString stdenv.hostPlatform.isLinux ''
+            # libfenix: since 1.90 rustc links with its own lld on x86_64-linux (`cc -fuse-ld=lld -B<sysroot>/gcc-ld`),
+            # which bypasses the ld wrapper of nix's cc: no rpath for the -L directories (e.g. openssl), the binaries
+            # miss their libraries at runtime. As rust-overlay does (oxalica/rust-overlay#171): the bundled ld.lld goes
+            # through nixpkgs' ld-wrapper.sh, the unwrapped one moves next to it (it is a wrapper itself, the name
+            # matters). Other targets don't link through gcc-ld/ld.lld (wasm: rust-lld, musl: cc with its own crt),
+            # so they need no flag and stay as they are
+            wrap() {
+              local dst="$1"
+              local wrapper="$2"
+              export prog="$3"
+              export use_response_file_by_default=0
+              substituteAll "$wrapper" "$dst"
+              chmod +x "$dst"
+            }
+
+            dsts=( $out/lib/rustlib/*/bin/gcc-ld/ld.lld )
+            if [ -e "''${dsts[0]}" ]; then
+              mkdir -p $out/nix-support
+              substituteAll ${path}/pkgs/build-support/wrapper-common/utils.bash $out/nix-support/utils.bash
+              substituteAll ${path}/pkgs/build-support/wrapper-common/darwin-sdk-setup.bash $out/nix-support/darwin-sdk-setup.bash
+              substituteAll ${path}/pkgs/build-support/bintools-wrapper/add-flags.sh $out/nix-support/add-flags.sh
+              substituteAll ${path}/pkgs/build-support/bintools-wrapper/add-hardening.sh $out/nix-support/add-hardening.sh
+              for dst in "''${dsts[@]}"; do
+                unwrapped="$(dirname "$dst")-unwrapped/ld.lld"
+                mkdir -p "$(dirname "$unwrapped")"
+                mv "$dst" "$unwrapped"
+                wrap "$dst" ${path}/pkgs/build-support/bintools-wrapper/ld-wrapper.sh "$unwrapped"
               done
             fi
           ''}

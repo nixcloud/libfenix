@@ -77,8 +77,15 @@ The overlay adds `pkgs.libfenix`.
 * `cargo.fromSource` builds the release from source: its generated nix build system with the dist rustc/cargo of the
   same version. `cargo.asset` packs that build into the release asset (no RUNPATH, the FHS interpreter, no store
   paths), reproducibly, so `nix build .#rust-1_99.cargo.asset` gives the file the toolchain downloads
-* rustc ≥ 1.90 on x86_64-linux links with its own lld, past nix's ld wrapper (binaries without rpath). The combined
-  `rustc`/`rustdoc` of these versions pass `-C linker-features=-lld`, as cargo (libnix) needs
+* rustc ≥ 1.90 on x86_64-linux links with its own lld (`cc -fuse-ld=lld -B<sysroot>/gcc-ld`), past nix's ld wrapper:
+  binaries without rpath, missing e.g. libssl.so.3. As in rust-overlay
+  ([#171](https://github.com/oxalica/rust-overlay/pull/171)), the bundled `gcc-ld/ld.lld` of `rustc` goes through
+  nixpkgs' `ld-wrapper.sh`, which adds the rpaths like nix's ld (the unwrapped one is in `gcc-ld-unwrapped/`). No rustc
+  flag is involved, so cross compiling works as with fenix: wasm32 links with `rust-lld`, musl with the cc and its own
+  crt, neither through `gcc-ld/ld.lld`. (`-C linker-features=-lld`, the other fix, is stable on
+  `x86_64-unknown-linux-gnu` only and makes `rustc --target wasm32-unknown-unknown` fail)
+* cross compiling: combine the toolchain with the targets' std, e.g. for wasm-pack
+  `libfenix.combine [ libfenix.rust-1_99.minimalToolchain libfenix.targets.wasm32-unknown-unknown.rust-1_99.rust-std ]`
 * x86_64-linux only: the release build systems were generated there, and cargo (libnix) is developed and tested there
 * removed: the stable/beta/nightly channels, `fromManifest`/`fromManifestFile`, rust-analyzer nightly and its vscode
   extension, the update bots

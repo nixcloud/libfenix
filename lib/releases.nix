@@ -18,6 +18,9 @@ let
       triple = "x86_64-unknown-linux-gnu";
       assetName = "cargo-${tag}-${triple}";
 
+      # "libnix-1.99.0+v2" -> "1.99.0"
+      version = lib.head (lib.splitString "+" (lib.removePrefix "libnix-" tag));
+
       fromSource =
         let
           buildsystem = builtins.fetchTarball {
@@ -28,10 +31,24 @@ let
             url = "https://github.com/nixcloud/cargo/archive/refs/tags/${tagUrl}.tar.gz";
             sha256 = srcSha256;
           };
+          # built as the releases are (master-libnix's nixLd): rustc >= 1.90 links with the cc's ld (the toolchain's
+          # wrapped ld.lld would link the same binary differently), so `asset` reproduces the uploaded file. Only the
+          # host is built here, so the flag (stable on x86_64-unknown-linux-gnu only) is fine
+          rustc =
+            if lib.versionAtLeast version "1.90" then
+              pkgs.symlinkJoin
+                {
+                  name = "rustc-${version}-nix-ld";
+                  paths = [ toolchain.rustc ];
+                  nativeBuildInputs = [ pkgs.makeWrapper ];
+                  postBuild = ''
+                    for b in rustc rustdoc; do wrapProgram $out/bin/$b --add-flags "-C linker-features=-lld"; done
+                  '';
+                }
+            else toolchain.rustc;
         in
         (import (buildsystem + "/derivations/default.nix") {
-          inherit pkgs;
-          rustc = toolchain.rustc;
+          inherit pkgs rustc;
           cargo = toolchain.cargo-vanilla or toolchain.cargo;
           project_root = src;
           external_crate_dependencies = import (buildsystem + "/Cargo.dependencies.nix") { inherit pkgs; };
