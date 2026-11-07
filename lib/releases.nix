@@ -18,7 +18,7 @@ let
       triple = "x86_64-unknown-linux-gnu";
       assetName = "cargo-${tag}-${triple}";
 
-      # "libnix-1.99.0+v2" -> "1.99.0"
+      # "libnix-1.99.0+v3" -> "1.99.0"
       version = lib.head (lib.splitString "+" (lib.removePrefix "libnix-" tag));
 
       fromSource =
@@ -93,10 +93,10 @@ in
   };
 
   "1.99.0" = release {
-    tag = "libnix-1.99.0+v2";
-    assetSha256 = "1q4lg720ybl65j9xjj1687pkimgrhy7yaajg8rya2d5nbn6gfj35";
-    buildsystemSha256 = "sha256:0v10kxslf5140wd5b14anc79n9c0lkz5yv2y0ni1vxxbzzmadh35";
-    srcSha256 = "sha256:1p7llhf5kl2yqr5zcdya81nfr63lsn3iysyc8r827rabz4b8lfg4";
+    tag = "libnix-1.99.0+v3";
+    assetSha256 = "0xl86y860vk2pv6dnjhhhh3drq4h274386ccrp5qsvji43n14n0x";
+    buildsystemSha256 = "sha256:1qqagxk4i0ixrnmv7g9hmgv51vk2nz9x12kivgkfwmx1s3lxb5mq";
+    srcSha256 = "sha256:08kriapilxskjfxg3pnsk731hzvm8czzhjw9r1mhzqxz3bslj2hd";
     unit = "cargo-0_100_0-bin-463824861cef8abc";
   };
 }

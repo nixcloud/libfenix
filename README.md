@@ -11,7 +11,7 @@ are fenix's, restricted to two pinned versions.
 | attribute | rustc / dist manifest | cargo |
 |---|---|---|
 | `rust-1_87` | 1.87.0 (2025-05-15) | cargo (libnix) [`libnix-1.87.0+v5`](https://github.com/nixcloud/cargo/releases/tag/libnix-1.87.0%2Bv5) |
-| `rust-1_99`, `latest` | 1.99.0 (2026-10-01) | cargo (libnix) [`libnix-1.99.0+v2`](https://github.com/nixcloud/cargo/releases/tag/libnix-1.99.0%2Bv2) |
+| `rust-1_99`, `latest` | 1.99.0 (2026-10-01) | cargo (libnix) [`libnix-1.99.0+v3`](https://github.com/nixcloud/cargo/releases/tag/libnix-1.99.0%2Bv3) |
 
 There are no channels (stable, beta, nightly) and no dated toolchains: a toolchain needs a cargo (libnix) release of
 its version. Other versions, dates or channels fail with an error naming the supported ones.
@@ -54,7 +54,7 @@ Each toolchain set has what a fenix channel has:
 * `toolchain` (all components), `minimalToolchain`, `defaultToolchain`, `completeToolchain` (rustup's profiles)
 * `withComponents [ "rustc" "cargo" "rust-src" ]`
 * `cargo-vanilla`: the dist cargo of that version
-* `version` (`"1.99.0"`), `libnixRelease` (`"libnix-1.99.0+v2"`)
+* `version` (`"1.99.0"`), `libnixRelease` (`"libnix-1.99.0+v3"`)
 
 And as in fenix:
 
