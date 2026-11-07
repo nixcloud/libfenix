@@ -10,7 +10,7 @@ are fenix's, restricted to two pinned versions.
 
 | attribute | rustc / dist manifest | cargo |
 |---|---|---|
-| `rust-1_87` | 1.87.0 (2025-05-15) | cargo (libnix) [`libnix-1.87.0+v5`](https://github.com/nixcloud/cargo/releases/tag/libnix-1.87.0%2Bv5) |
+| `rust-1_87` | 1.87.0 (2025-05-15) | cargo (libnix) [`libnix-1.87.0+v6`](https://github.com/nixcloud/cargo/releases/tag/libnix-1.87.0%2Bv6) |
 | `rust-1_99`, `latest` | 1.99.0 (2026-10-01) | cargo (libnix) [`libnix-1.99.0+v3`](https://github.com/nixcloud/cargo/releases/tag/libnix-1.99.0%2Bv3) |
 
 There are no channels (stable, beta, nightly) and no dated toolchains: a toolchain needs a cargo (libnix) release of

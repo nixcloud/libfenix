@@ -85,10 +85,10 @@ let
 in
 {
   "1.87.0" = release {
-    tag = "libnix-1.87.0+v5";
-    assetSha256 = "16gg6a4jmn1mbbyr1jgg836m3hcdppd7xmc36aqxih4bl98ixz86";
-    buildsystemSha256 = "sha256:0k5265x6x5618yvx44qlg6z1rmc0k76g9fj82pmyiacazr8nh7zd";
-    srcSha256 = "sha256:16qcm28k3q3cwwv5g49fiic2bicws5s060yaz8x34g9jn0imsbzs";
+    tag = "libnix-1.87.0+v6";
+    assetSha256 = "03zapasf8qvv3qh3bz3q9l3arb69ni1h09msxqfk78r77nxddsxv";
+    buildsystemSha256 = "sha256:1fqc257xjywbs475512lmf2pnjj6kgh8bfxnspzbnhrpc0xbs8vz";
+    srcSha256 = "sha256:1vhkxl0pby6n06257bmlzl9iyk79hsndcys5m5wk2vjswrqsjfql";
     unit = "cargo-0_88_0-bin-d7e8a77a599efbea";
   };
 
